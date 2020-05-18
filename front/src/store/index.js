@@ -52,6 +52,12 @@ export default new Vuex.Store({
                 state.pagesSequence = state.pagesSequence.splice(index, 1)
             }
             delete state.pagesMap[id]
+        },
+        pageToCollection(state, pageId) {
+            state.pagesSequence.push(pageId);
+        },
+        sortPagesFilename(state) {
+            state.pagesSequence.sort();
         }
     },
     actions: {
@@ -62,7 +68,7 @@ export default new Vuex.Store({
                 .then(({data}) => commit('listing', data.items))
                 .finally(() => commit('loading', false))
         },
-        uploadPage({getters}, {file, seriesId}) {
+        uploadPage({getters, commit}, {file, seriesId}) {
             const id = seriesId || getters.currentSeriesId;
             if (!id) return;
 
@@ -70,11 +76,14 @@ export default new Vuex.Store({
             form.append("file", file);
             return getClient().post(`/series/${id}/pages`, form, {
                 headers: {'Content-Type': 'multipart/form-data'}
-            }).then(({data}) => data);
+            }).then(({data}) => {
+                commit('pageToCollection', data.id);
+                return data;
+            });
         },
         saveSeries({}, {id, info, pages}) {
             if (id) {
-                return getClient().put(`/series/${id}`, {info})
+                return getClient().put(`/series/${id}`, {info, pages})
             } else {
                 return getClient().post("/series", {info})
                     .then(({data}) => data)
@@ -112,11 +121,18 @@ export default new Vuex.Store({
                 }
             })
         },
-        savePage({commit, getters}, {pageId, meta}) {
+        savePage({commit, getters, state}, {pageId, meta}) {
             const id = pageId || this.currentPageId;
             if (!id) return;
             commit('updatePage', {id: pageId, meta: meta});
             return getClient().put(`/pages/${id}`, {meta})
+        },
+        savePagesOrder({getters}) {
+            const pages = getters.pagesList.map((id) => {
+                return id.split("__").slice(1).join("__")
+            });
+            console.log(pages);
+            return getClient().put(`/series/${getters.currentSeriesId}`, {pages})
         }
     },
     getters: {
@@ -141,6 +157,9 @@ export default new Vuex.Store({
         },
         hasPages(state, getters) {
             return !!getters.firstPageOfSeries
+        },
+        pagesList(state) {
+            return state.pagesSequence;
         }
     },
     modules: {}

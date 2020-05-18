@@ -17,6 +17,7 @@
                 :scale="scale"
                 :image-url="page.imageUrl"
                 :translation="page.meta"
+                @navigate="nav"
         />
     </div>
 </template>
@@ -24,7 +25,7 @@
 <script>
     import ImagePreviewer from "../components/ImagePreviewer";
     import PreviewerToolbar from "../components/PreviewerToolbar";
-    import {mapGetters} from "vuex";
+    import {mapGetters, mapMutations} from "vuex";
 
     export default {
         name: "ImagePreview",
@@ -41,6 +42,12 @@
             }
         },
         methods: {
+            ...mapMutations(['setCurrentPage']),
+            nav(val) {
+                if (val > 0 && this.currentPage === this.numberOfPages) return;
+                if (val < 0 && this.currentPage === 1) return;
+                this.changePage(this.currentPage+ val);
+            },
             changeScale(newValue) {
                 this.scale = newValue;
             },
@@ -62,12 +69,12 @@
                 if (this.currentPageId === nextPage) return;
                 console.log('navigate')
                 this.$router.push({
-                    params: { pageId: nextPage }
+                    params: {pageId: nextPage}
                 })
             },
         },
         computed: {
-            ...mapGetters({page: 'currentPage', }),
+            ...mapGetters({page: 'currentPage',}),
             ...mapGetters(['isSeriesLoaded', 'numberOfPages', 'currentPageIndex']),
             pageLoaded() {
                 return !!this.page

@@ -8,11 +8,6 @@
                 <v-icon>zoom_out</v-icon>
             </v-btn>
             {{ displayScale }}
-            <span class="px-sm-5"/>
-            <v-btn icon @click="displayAll = !displayAll">
-                <v-icon v-if="displayAll">visibility_off</v-icon>
-                <v-icon v-else>visibility</v-icon>
-            </v-btn>
         </div>
         <div class="w-33p d-flex justify-center">
             <div class="d-flex w-100" style="max-width: 150px" v-if="showPager">
@@ -27,7 +22,11 @@
                 </v-btn>
             </div>
         </div>
-        <div class="w-33p d-flex justify-end">
+        <div class="w-33p d-flex justify-space-between">
+            <v-btn icon @click="displayAll = !displayAll" class="ml-2">
+                <v-icon v-if="displayAll">visibility_off</v-icon>
+                <v-icon v-else>visibility</v-icon>
+            </v-btn>
             <v-btn icon @click="$emit('close')" v-if="showCloser">
                 <v-icon>close</v-icon>
             </v-btn>

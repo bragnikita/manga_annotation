@@ -35,7 +35,10 @@
             <v-row>
                 <v-col sm="12">
                     <v-card v-if="canUpload">
-                        <v-card-title>Pages (total {{ pages.length }})</v-card-title>
+                        <v-card-title class="d-flex justify-space-between">
+                            <span>Pages (total {{ pages.length }})</span>
+                            <v-btn @click="sortPages">Sort by filename</v-btn>
+                        </v-card-title>
                         <v-card-text>
                             <v-container fluid>
                                 <v-row dense>
@@ -147,14 +150,32 @@
             hasCover() {
                 return !!this.cover;
             },
-            ...mapGetters(["firstPageOfSeries", "numberOfPages", "hasPages", "currentSeriesId"])
+            ...mapGetters(["firstPageOfSeries", "numberOfPages", "hasPages", "currentSeriesId", "pagesList"])
         },
         watch: {
             title: 'validateField',
             uploaderModel: 'handleUpload',
+            pagesList(newList, oldList) {
+                const sortedPages = [];
+                let notFound = false;
+                newList.forEach((id) => {
+                    const p = this.pages.find((p) => p.id === id);
+                    if (!p) {
+                        notFound = true;
+                    }
+                    sortedPages.push(p);
+                });
+                if (!notFound) {
+                    this.pages = sortedPages;
+                }
+            }
         },
         methods: {
-            ...mapMutations(['setReturnTo']),
+            ...mapMutations(['setReturnTo', 'sortPagesFilename']),
+            async sortPages() {
+              this.sortPagesFilename();
+              await this.$store.dispatch('savePagesOrder');
+            },
             goToEdit(pageId) {
                 this.setReturnTo(this.$route);
                 this.$router.push({
@@ -177,7 +198,7 @@
                             title: this.title,
                             description: this.description,
                             coverId: this.cover ? this.cover.id : undefined,
-                        }
+                        },
                     })
                 }
             },

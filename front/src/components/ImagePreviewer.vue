@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="image_container" @resize="reimport">
-            <img id="image_target" :src="imageUrl" @load="onLoaded"
+            <img id="image_target" :src="imageUrl" @load="onLoaded" @click.self.prevent="navClick"
                  :style="styleImg"
             />
             <div v-for="bubble of bubblesMarkers" :key="bubble.id"
@@ -55,6 +55,15 @@
             }
         },
         methods: {
+            navClick(event) {
+                const imageWidth = this.$img.width();
+                const offsetX = event.offsetX;
+                if (offsetX > imageWidth / 2) {
+                    this.$emit('navigate', 1)
+                } else {
+                    this.$emit('navigate', -1)
+                }
+            },
             onLoaded() {
                 this.$img = jQuery('#image_target');
                 this.reimport();
