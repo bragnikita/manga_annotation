@@ -1,0 +1,39 @@
+.bubble_base {
+  padding: 5px;
+  background-color: white;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre-line;
+  overflow: hidden;
+}
+.bubble {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  padding: 5px;
+  background-color: white;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre-line;
+  overflow: hidden;
+}
+.commited_bubble {
+  @extend .bubble_base;
+  position: absolute;
+  border: double black;
+}
+.editor_bubble {
+  @extend .bubble_base;
+  overflow: inherit;
+}
+
+.hide-bubble-preview {
+  .bubble {
+    display: none !important;
+  }
+}
