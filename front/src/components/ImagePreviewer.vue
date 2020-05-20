@@ -12,9 +12,9 @@
             <div v-for="bubble of bubblesToDisplay" :class="['commited_bubble']"
                  @mouseleave="hide(bubble)" :style="[bubble.areaPositionStyle,
                  bubble.styles]"
-            ><div class="bubble-text-wrapper" :style="bubble.textStyle">
+            ><span class="bubble-text-wrapper" :style="bubble.textStyle">
                 {{ bubble.text }}
-            </div>
+            </span>
             </div>
         </div>
     </div>
@@ -86,7 +86,7 @@
 
                     const ratio = iWidth / annotation.orig_image.width;
                     const textStyle = {
-                      transform: `scale(${ratio})`
+                      fontSize: `${ratio*100}%`
                     };
 
                     return {
@@ -151,7 +151,7 @@
 
 <style scoped lang="scss">
     .image_container {
-        max-width: 1000px;
+
         position: relative;
         img {
             width: 100%;

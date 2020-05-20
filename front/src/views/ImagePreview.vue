@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="max-width: 1000px; display: inline-block">
         <previewer-toolbar
                 @scale="changeScale"
                 @visibility="displayAll=$event"
