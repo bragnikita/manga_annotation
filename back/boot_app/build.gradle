@@ -36,6 +36,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.8.3' // required
 	implementation 'org.broadbear:link-preview:1.2'
     implementation 'com.auth0:java-jwt:3.4.0'
+    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.0')
 }
 
 bootRun {

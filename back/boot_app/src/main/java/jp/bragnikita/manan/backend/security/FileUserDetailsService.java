@@ -2,6 +2,7 @@ package jp.bragnikita.manan.backend.security;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,15 +41,14 @@ public class FileUserDetailsService implements UserDetailsService {
     @PostConstruct
     @Scheduled(fixedRate = 1000 * 60)
     public void reload() {
-        System.out.println("reloading");
         File file = pathToUsersFile.toFile();
         if (file.exists()) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                 UsersFile f = mapper.readValue(file, UsersFile.class);
                 synchronized (this) {
                     userToPassword.clear();
-                    Arrays.stream(f.records).forEach((usersRecord -> {
+                    Arrays.stream(f.users).forEach((usersRecord -> {
                         userToPassword.put(usersRecord.username, usersRecord);
                     }));
                 }
@@ -78,7 +78,7 @@ public class FileUserDetailsService implements UserDetailsService {
     @Setter
     @NoArgsConstructor
     private static class UsersFile {
-        private UsersRecord[] records = new UsersRecord[]{};
+        private UsersRecord[] users = new UsersRecord[]{};
     }
 
     @Getter

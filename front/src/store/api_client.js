@@ -7,7 +7,6 @@ let accessToken = null;
 const getClient = (prefix = "/api") => {
     const headers = {};
     if (accessToken) {
-        console.log(accessToken)
         headers['Authorization'] = accessToken;
     }
     return axios.create({

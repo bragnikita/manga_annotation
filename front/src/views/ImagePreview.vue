@@ -52,6 +52,10 @@
                 this.scale = newValue;
             },
             onClose() {
+                if (this.isGuest) {
+                    this.$router.push({name: "series_list"});
+                    return;
+                }
                 if (this.$store.state.returnTo) {
                     this.$router.push(this.$store.state.returnTo);
                     return;
@@ -75,7 +79,7 @@
         },
         computed: {
             ...mapGetters({page: 'currentPage',}),
-            ...mapGetters(['isSeriesLoaded', 'numberOfPages', 'currentPageIndex']),
+            ...mapGetters(['isSeriesLoaded', 'numberOfPages', 'currentPageIndex', "isGuest"]),
             pageLoaded() {
                 return !!this.page
             },

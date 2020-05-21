@@ -9,11 +9,11 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-text-field label="Username" required v-model="username"
-                                    autocomplete="username"/>
+                                                  autocomplete="username"/>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field label="Password" type="password" required v-model="password"
-                                    autocomplete="current-password"/>
+                                                  autocomplete="current-password" @keypress.enter="doSignIn"/>
                                 </v-col>
                             </v-row>
                         </form>
@@ -29,12 +29,26 @@
         <v-app-bar dense>
             <v-toolbar-title>My Otakumole</v-toolbar-title>
             <v-spacer/>
-            <v-btn @click="signInShown = true" v-if="isGuest">
+            <v-btn type="primary" @click="signInShown = true" v-if="isGuest">
                 Sign in
             </v-btn>
-            <v-btn icon @click="createNew" color="green">
-                <v-icon>add</v-icon>
-            </v-btn>
+            <access-control editor>
+                <v-btn icon @click="createNew" color="green">
+                    <v-icon>add</v-icon>
+                </v-btn>
+                <v-menu bottom right>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon v-on="on">
+                            <v-icon>account_circle</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item @click="signOut">
+                            <v-list-item-title>Logout</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </access-control>
         </v-app-bar>
         <v-container>
             <v-row dense v-if="loading">
@@ -63,7 +77,9 @@
                         <v-card-text style="white-space: pre-line">{{item.description}}</v-card-text>
                         <v-card-actions>
                             <v-btn color="orange" text @click="gotoRead(item)">Read</v-btn>
-                            <v-btn color="orange" text @click="gotoEdit(item)">Edit</v-btn>
+                            <access-control editor>
+                                <v-btn color="orange" text @click="gotoEdit(item)">Edit</v-btn>
+                            </access-control>
                         </v-card-actions>
                     </v-card>
                 </v-col>
@@ -74,10 +90,11 @@
 
 <script>
     import {mapState, mapGetters, mapMutations, mapActions} from 'vuex';
+    import AccessControl from "../components/AccessControl";
 
     export default {
         name: "SeriesList",
-        components: {},
+        components: {'access-control': AccessControl},
         data() {
             /*
             coverUrl
@@ -141,7 +158,7 @@
                 this.signIn({username: this.username, password: this.password})
             },
             ...mapMutations(['setReturnTo']),
-            ...mapActions(['signIn'])
+            ...mapActions(['signIn', 'signOut'])
         },
         created() {
             this.$store.dispatch('loadListing');

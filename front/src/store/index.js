@@ -67,6 +67,10 @@ export default new Vuex.Store({
             state.authenticated = true;
             state.user = user;
         },
+        signOut(state) {
+            state.authenticated = false;
+            state.user = null;
+        },
         setGlobalError(state, message) {
             state.error = message;
             state.errorChanged = new Date().getTime();
@@ -161,6 +165,11 @@ export default new Vuex.Store({
             } else {
                 commit('setGlobalError', "Username/password pair is incorrect")
             }
+        },
+        signOut({ commit }) {
+            setAccessToken(null);
+            window.localStorage.removeItem("ma:access_token");
+            commit('signOut')
         }
     },
     getters: {
@@ -189,9 +198,10 @@ export default new Vuex.Store({
         pagesList(state) {
             return state.pagesSequence;
         },
+        user: (state) => state.user,
         isAuthenticated: (state) => state.authenticated,
-        isAdmin: state => true,
-        isEditor: state => true,
+        isAdmin: state => state.user && state.user.username === 'admin',
+        isEditor: (state, getters) => getters.isAdmin,
         isGuest: (state,getters) => !getters.isAuthenticated,
         hasError: (state) => !!state.error,
         error: (state) => state.error,
