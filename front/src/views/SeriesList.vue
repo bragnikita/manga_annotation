@@ -1,8 +1,37 @@
 <template>
     <fragment>
+        <v-dialog width="400" v-model="signInShown">
+            <v-snackbar v-model="loginError" :timeout="2000" color="red">{{ error }}</v-snackbar>
+            <v-card>
+                <v-card-text>
+                    <v-container>
+                        <form>
+                            <v-row>
+                                <v-col cols="12">
+                                    <v-text-field label="Username" required v-model="username"
+                                    autocomplete="username"/>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-text-field label="Password" type="password" required v-model="password"
+                                    autocomplete="current-password"/>
+                                </v-col>
+                            </v-row>
+                        </form>
+                    </v-container>
+                </v-card-text>
+                <v-divider/>
+                <v-card-actions>
+                    <v-btn color="green" @click="doSignIn">Sign in</v-btn>
+                    <v-btn color="red" @click="signInShown = false">Cancel</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-app-bar dense>
             <v-toolbar-title>My Otakumole</v-toolbar-title>
             <v-spacer/>
+            <v-btn @click="signInShown = true" v-if="isGuest">
+                Sign in
+            </v-btn>
             <v-btn icon @click="createNew" color="green">
                 <v-icon>add</v-icon>
             </v-btn>
@@ -44,7 +73,7 @@
 </template>
 
 <script>
-    import {mapState, mapGetters, mapMutations} from 'vuex';
+    import {mapState, mapGetters, mapMutations, mapActions} from 'vuex';
 
     export default {
         name: "SeriesList",
@@ -61,6 +90,20 @@
              */
             return {
                 items: [],
+                signInShown: false,
+                username: "",
+                password: "",
+                loginError: false,
+            }
+        },
+        watch: {
+            isGuest(isGuest) {
+                if (this.signInShown && !isGuest) {
+                    this.signInShown = false
+                }
+            },
+            lastErrorTime(has) {
+                this.loginError = true;
             }
         },
         computed: {
@@ -73,7 +116,7 @@
                 });
             },
             ...mapState(['loading', 'listing']),
-            ...mapGetters(['firstPageOfSeries']),
+            ...mapGetters(['firstPageOfSeries', "lastErrorTime", 'isAuthenticated', 'isGuest', "error", "hasError"]),
         },
         methods: {
             gotoRead(series) {
@@ -94,27 +137,14 @@
             createNew() {
                 this.$router.push({name: "SeriesCreate"})
             },
-            ...mapMutations(['setReturnTo'])
+            doSignIn() {
+                this.signIn({username: this.username, password: this.password})
+            },
+            ...mapMutations(['setReturnTo']),
+            ...mapActions(['signIn'])
         },
         created() {
             this.$store.dispatch('loadListing');
-            // this.items = [
-            //     {
-            //         id: 1,
-            //         coverUrl: '/samples/sample1.png',
-            //         title: 'Magia record ch 1',
-            //         author: 'Fujino Fuji',
-            //         status: 'done',
-            //         description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris est ligula, porttitor a ornare quis, ullamcorper nec urna. Fusce a tempus urna, vel faucibus mauris. Sed id ullamcorper tellus. Duis suscipit ligula magna. Donec varius velit ultricies, lobortis magna placerat, mattis mi. Donec in lectus accumsan, sagittis neque id, gravida ligula. Suspendisse non scelerisque magna. Nulla consectetur risus in ullamcorper porta. Aenean tempus placerat faucibus. Duis eros eros, porttitor non dictum vitae, pharetra eget ligula. Etiam euismod molestie convallis. Nunc congue maximus purus non euismod.',
-            //     },
-            //     {
-            //         id: 2,
-            //         coverUrl: 'https://picsum.photos/300/200',
-            //         title: 'Princess club',
-            //         status: 'in_progress',
-            //         description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eros odio, feugiat sit amet rhoncus at, luctus nec turpis. Phasellus eleifend orci ac tristique dignissim. Suspendisse porttitor, est ac porttitor posuere, est dolor scelerisque purus, quis vehicula elit elit in metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac viverra eros. Donec et velit sit amet magna accumsan hendrerit vel eget odio. Fusce pulvinar ligula et sapien luctus pharetra. Nunc varius malesuada malesuada.'
-            //     }
-            // ]
         }
     }
 </script>

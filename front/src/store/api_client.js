@@ -1,9 +1,21 @@
 import {default as axios} from 'axios';
 import {getApiBase} from "../config";
 
-const getClient = () => {
+let accessToken = null;
+
+
+const getClient = (prefix = "/api") => {
+    const headers = {};
+    if (accessToken) {
+        console.log(accessToken)
+        headers['Authorization'] = accessToken;
+    }
     return axios.create({
-        baseURL: getApiBase() + "/api"
+        baseURL: getApiBase() + prefix,
+        headers,
     });
 };
+
+export const setAccessToken = (tokenStr) => { accessToken = tokenStr };
+
 export default getClient;

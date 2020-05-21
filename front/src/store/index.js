@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import getClient from "./api_client";
+import getClient, {setAccessToken} from "./api_client";
 
 Vue.use(Vuex);
 
@@ -13,6 +13,10 @@ export default new Vuex.Store({
         pagesMap: {},
         pagesSequence: [],
         returnTo: undefined,
+        authenticated: false,
+        user: null,
+        error: "",
+        errorChanged: 0,
     },
     mutations: {
         loading(state, value) {
@@ -58,6 +62,14 @@ export default new Vuex.Store({
         },
         sortPagesFilename(state) {
             state.pagesSequence.sort();
+        },
+        setUser(state, user) {
+            state.authenticated = true;
+            state.user = user;
+        },
+        setGlobalError(state, message) {
+            state.error = message;
+            state.errorChanged = new Date().getTime();
         }
     },
     actions: {
@@ -133,6 +145,22 @@ export default new Vuex.Store({
             });
             console.log(pages);
             return getClient().put(`/series/${getters.currentSeriesId}`, {pages})
+        },
+        async signIn({ commit }, credentials) {
+            const res = await getClient("").post(`/login`, credentials, {
+                 validateStatus: status => {
+                     return status < 500
+                 }
+            });
+            if (res.status !== 401) {
+                console.log(res.headers);
+                const token = res.headers['authorization'];
+                setAccessToken(token);
+                commit('setUser', { username: credentials.username });
+                window.localStorage.setItem("ma:access_token", token);
+            } else {
+                commit('setGlobalError', "Username/password pair is incorrect")
+            }
         }
     },
     getters: {
@@ -160,7 +188,14 @@ export default new Vuex.Store({
         },
         pagesList(state) {
             return state.pagesSequence;
-        }
+        },
+        isAuthenticated: (state) => state.authenticated,
+        isAdmin: state => true,
+        isEditor: state => true,
+        isGuest: (state,getters) => !getters.isAuthenticated,
+        hasError: (state) => !!state.error,
+        error: (state) => state.error,
+        lastErrorTime: (state) => state.errorChanged,
     },
     modules: {}
 })

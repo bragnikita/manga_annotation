@@ -4,12 +4,20 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify';
 import Fragment from 'vue-fragment';
+import  {setAccessToken} from "./store/api_client";
 
 Vue.use(Fragment.Plugin);
 
 Vue.config.productionTip = false;
 
-console.log("Starting")
+console.log("Starting");
+
+let token = window.localStorage.getItem("ma:access_token");
+if (token) {
+  setAccessToken(token);
+  store.commit('setUser', { username: "admin" });
+}
+
 
 new Vue({
   router,
