@@ -119,14 +119,11 @@ export default new Vuex.Store({
             commit('removePage', {id});
             return getClient().delete(`/pages/${id}`)
         },
-        loadPage({getters, commit}, {pageId, setCurrent = false} = {}) {
-            // if (getters.pageById(pageId)) {
-            //     if (setCurrent) {
-            //         commit('setCurrentPage', {id: pageId});
-            //     }
-            //     return;
-            // }
-            return getClient().get(`/pages/${pageId}`).then(({data}) => {
+        async loadPage({getters, commit, dispatch}, {pageId, setCurrent = false, seriesId} = {}) {
+            if (!getters.currentSeries) {
+                await dispatch("loadSeries", { id: seriesId, setCurrent: true})
+            }
+            return await getClient().get(`/pages/${pageId}`).then(({data}) => {
                 commit('addPage', {
                     id: data.id,
                     imageUrl: data.imageUrl,

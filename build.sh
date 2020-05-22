@@ -7,6 +7,10 @@ fi
 if [[ $TARGET = "ALL" || $TARGET = "server" ]]; then
   SERVER="ok"
 fi
+if [[ -z $WEB && -z $SERVER ]]; then
+  FILE=$TARGET
+fi
+
 
 if [[ -n $WEB ]]; then
   (cd front && npm run-script build)
@@ -17,8 +21,10 @@ fi
 if [[ -n $SERVER ]]; then
   (cd back/boot_app && ./gradlew bootJar)
   cp back/boot_app/build/libs/server.jar dist
-  cp back/production.properties dist/application.properties
-  cp back/start.sh dist/
+  rsync -a -P dist/server.jar __magireco_services:/opt/bitnami/apps/ma/
+#  cp back/production.properties dist/application.properties
+#  cp back/start.sh dist/
 fi
-
-#(cd dist && ./start.sh)
+if [[ -n $FILE ]]; then
+  rsync -a -P dist/${FILE} __magireco_services:/opt/bitnami/apps/ma/
+fi

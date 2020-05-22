@@ -302,6 +302,11 @@
                 }
             },
             toEditMode(bubble) {
+                if (bubble.styles) {
+                    this.currentBubbleStyle = this.cssToStylesMap({...bubble.styles}) ;
+                } else {
+                    this.currentBubbleStyle = {...this.defaultBubbleStyle}
+                }
                 this.openEditor(bubble);
                 this.$img.selectAreas('add', {...bubble});
 
@@ -376,6 +381,20 @@
             },
             onSave() {
                 this.$emit('save', this.exportIt())
+            },
+            cssToStylesMap(css) {
+                let fontSize = this.defaultBubbleStyle.fontSize;
+                const fontSizeStr = css.fontSize;
+                if (fontSizeStr) {
+                    const m = fontSizeStr.match(/(\d+)/);
+                    if (m) {
+                        fontSize = parseInt(m[1], 10);
+                    }
+                }
+                return {
+                    ...css,
+                    fontSize: fontSize,
+                }
             }
         },
         computed: {
@@ -411,7 +430,7 @@
                     left: left + 'px',
                     width: w + 'px',
                     height: h + 'px',
-                    zIndex: z,
+                    zIndex: 10000,
                 }
             },
             defaultStyle() {
