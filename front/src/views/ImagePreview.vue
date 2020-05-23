@@ -106,6 +106,7 @@
                 pageId: pageId,
                 setCurrent: true,
             });
+            window.scrollTo(0,0)
         },
         watch: {
             currentPageId(newPageId) {
