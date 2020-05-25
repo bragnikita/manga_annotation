@@ -159,6 +159,7 @@ export default new Vuex.Store({
                 setAccessToken(token);
                 commit('setUser', { username: credentials.username });
                 window.localStorage.setItem("ma:access_token", token);
+                window.localStorage.setItem("ma:token_expire_at", (Date.now() + 24*60*60*1000).toString(10));
             } else {
                 commit('setGlobalError', "Username/password pair is incorrect")
             }
@@ -166,6 +167,7 @@ export default new Vuex.Store({
         signOut({ commit }) {
             setAccessToken(null);
             window.localStorage.removeItem("ma:access_token");
+            window.localStorage.removeItem("ma:token_expire_at");
             commit('signOut')
         }
     },

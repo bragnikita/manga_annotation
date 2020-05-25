@@ -74,7 +74,7 @@
                                 />
                             </div>
                         </v-card-text>
-                        <v-card-text style="white-space: pre-line">{{item.description}}</v-card-text>
+                        <v-card-text style="white-space: pre-line" v-html="item.descriptionHtml"></v-card-text>
                         <v-card-actions>
                             <v-btn color="orange" text @click="gotoRead(item)">Read</v-btn>
                             <access-control editor>
@@ -91,6 +91,7 @@
 <script>
     import {mapState, mapGetters, mapMutations, mapActions} from 'vuex';
     import AccessControl from "../components/AccessControl";
+    import marked from "marked";
 
     export default {
         name: "SeriesList",
@@ -125,9 +126,10 @@
         },
         computed: {
             itemsDisplay() {
-                return this.listing.map((item) => {
+                return this.listing.reverse().map((item) => {
                     return {
                         ...item,
+                        descriptionHtml: this.mdToHtml(item),
                         hasCover: !!item.coverUrl,
                     }
                 });
@@ -136,6 +138,9 @@
             ...mapGetters(['firstPageOfSeries', "lastErrorTime", 'isAuthenticated', 'isGuest', "error", "hasError"]),
         },
         methods: {
+            mdToHtml(item) {
+              return marked(item.description);
+            },
             gotoRead(series) {
                 this.$store.dispatch("loadSeries", {id: series.id, setCurrent: true})
                     .then(() => {

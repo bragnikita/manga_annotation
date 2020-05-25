@@ -96,6 +96,7 @@
         },
         watch: {
             displayAll(val) {
+                window.localStorage.setItem("ma:preview:display-all", val);
                 this.$emit('visibility', val)
             },
             numberOfPages(newNumber) {
@@ -110,6 +111,9 @@
         },
         created() {
             this.setPages(this.numberOfPages);
+            if (window.localStorage.getItem("ma:preview:display-all") === "true") {
+                this.displayAll = true;
+            }
         }
     }
 </script>

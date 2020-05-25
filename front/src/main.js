@@ -12,8 +12,9 @@ Vue.config.productionTip = false;
 
 console.log("Starting");
 
-let token = window.localStorage.getItem("ma:access_token");
-if (token) {
+const token = window.localStorage.getItem("ma:access_token");
+const expireAt = parseInt(window.localStorage.getItem("ma:token_expire_at") || "0", 10);
+if (token && expireAt-3*60*60*1000 > Date.now()) {
   setAccessToken(token);
   store.commit('setUser', { username: "admin" });
 }

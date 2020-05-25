@@ -62,16 +62,14 @@
                 }
                 const seriesId = this.$route.params.seriesId;
                 if (seriesId) {
-                    this.$router.push({name: "SeriesEdit", params: {id: seriesId}})
+                    this.$router.push({name: "SeriesEdit", params: {id: seriesId}});
                     return;
                 }
             },
             changePage(nextPageIndex) {
                 const index = nextPageIndex - 1;
                 const nextPage = this.$store.getters.pageByIndex(index);
-                console.log(nextPageIndex, nextPage)
                 if (this.currentPageId === nextPage) return;
-                console.log('navigate')
                 this.$router.push({
                     params: {pageId: nextPage}
                 })
@@ -110,7 +108,6 @@
         },
         watch: {
             currentPageId(newPageId) {
-                console.log("newPageId = ", newPageId)
                 this.$store.dispatch("loadPage", {
                     pageId: newPageId,
                     setCurrent: true,
