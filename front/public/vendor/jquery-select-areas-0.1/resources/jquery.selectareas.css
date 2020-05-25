@@ -3,7 +3,7 @@
 	overflow: hidden;
 	position: absolute;
 }
-.blurred {
+.blurred__disabled {
 	filter: url("/filters.svg#blur3px");
 	-webkit-filter: blur(1px);
 	-moz-filter: blur(1px);
