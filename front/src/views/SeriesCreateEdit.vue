@@ -37,9 +37,19 @@
                     <v-card v-if="canUpload">
                         <v-card-title class="d-flex justify-space-between">
                             <span>Pages (total {{ pages.length }})</span>
-                            <v-btn @click="sortPages">Sort by filename</v-btn>
+                            <div v-if="sortDialog">
+                                <v-btn color="green"  class="mr-4" @click="commitManualSort">Confirm</v-btn>
+                                <v-btn color="red" @click="sortDialog = false">Cancel</v-btn>
+                            </div>
+                            <div v-else>
+                                <v-btn @click="sortPagesManual" class="mr-4">Manual sort</v-btn>
+                                <v-btn @click="sortPages">Sort by filename</v-btn>
+                            </div>
                         </v-card-title>
-                        <v-card-text>
+                        <v-card-text v-if="sortDialog">
+                            <sorter v-model="sortableItems" />
+                        </v-card-text>
+                        <v-card-text v-else>
                             <v-container fluid>
                                 <v-row dense>
                                     <v-col cols="3"
@@ -100,10 +110,12 @@
 
 <script>
     import {mapGetters, mapMutations} from "vuex";
+    import PagesSorterDialog from "../components/pages_sorter/PagesSorterDialog";
+    import Sorter from "../components/pages_sorter/PagesSorter";
 
     export default {
         name: "SeriesCreateEdit",
-        components: {},
+        components: {PagesSorterDialog, Sorter},
         data() {
             /*
             coverUrl
@@ -121,6 +133,7 @@
                 title: "New series",
                 description: "",
 
+
                 /* *
                 * previewUrl
                 * loading
@@ -133,6 +146,9 @@
                 nextIndex: 1,
 
                 cover: null,
+
+                sortDialog: false,
+                sortableItems: [],
             }
         },
         computed: {
@@ -171,10 +187,24 @@
             }
         },
         methods: {
-            ...mapMutations(['setReturnTo', 'sortPagesFilename']),
+            ...mapMutations(['setReturnTo', 'sortPagesFilename', 'sortPagesManualMode']),
             async sortPages() {
               this.sortPagesFilename();
               await this.$store.dispatch('savePagesOrder');
+            },
+            sortPagesManual() {
+                this.sortableItems = this.pages.map((p) => {
+                   return {
+                       id: p.id,
+                       src: p.previewUrl
+                   }
+                });
+                this.sortDialog = true;
+            },
+            async commitManualSort() {
+                this.sortPagesManualMode(this.sortableItems.map((p) => p.id));
+                await this.$store.dispatch('savePagesOrder');
+                this.sortDialog = false;
             },
             goToEdit(pageId) {
                 this.setReturnTo(this.$route);
@@ -294,7 +324,8 @@
                         }
                     })
             }
-        }
+        },
+
     }
 </script>
 

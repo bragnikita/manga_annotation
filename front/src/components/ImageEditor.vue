@@ -268,7 +268,7 @@
                     this.commit();
                 }
                 const index = this.bubbles.findIndex(b => b.id === id);
-                this.bubbles.splice(index, 1);
+                this.bubbles.splice(index, N1);
 
             },
             nextId() {

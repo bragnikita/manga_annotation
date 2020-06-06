@@ -1,0 +1,22 @@
+.drag-sorter-item {
+  height: 200px;
+  width: 140px;
+  border: 1px solid gray;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  background-color: white;
+  opacity: 0.5;
+  padding: 5px;
+}
+.sorter__root {
+  background-color: gray;
+  .drag-sorter-item {
+    opacity: 1;
+  }
+  .drag-sorter-list {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}

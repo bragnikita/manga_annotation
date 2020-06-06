@@ -63,6 +63,9 @@ export default new Vuex.Store({
         sortPagesFilename(state) {
             state.pagesSequence.sort();
         },
+        sortPagesManualMode(state, ids) {
+            state.pagesSequence = [...ids];
+        },
         setUser(state, user) {
             state.authenticated = true;
             state.user = user;
